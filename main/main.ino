@@ -26,9 +26,11 @@ int echoPin = 13;
 int trigPin = 12;
 const int MAX_DISTANCE = 350;
 
+long duration, cm, start, ending;
+
 //NewPing sonar(trigPin, echoPin, MAX_DISTANCE);
 
-float duration, distance;
+//float duration, distance;
 
 void setup() {
   Serial.begin(9600); 
@@ -41,11 +43,13 @@ void setup() {
 
 void loop() {
 
+detect_wall();
+
 //  turn_left();
 //  delay(2500);
-  turn_right();
-  delay(2500);
-  
+//  turn_right();
+//  delay(2500);
+
 //  delay(3000);
 //  rbt_stop();
 //  delay(2000);
@@ -78,11 +82,46 @@ void loop() {
 
 // BOLAJI: write function that uses left sensor to detect wall and returns that distance
 void detect_wall() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(5);
+  digitalWrite(trigPin, LOW);
+  
+  pinMode(trigPin, INPUT);
+  //duration = pulseIn(trigPin, HIGH);
+  while (digitalRead(echoPin) == LOW) {
+  }
+  start = micros();
+  while (digitalRead(echoPin) == HIGH) {
+  }
+  ending = micros();
+  duration = ending - start;
+  // convert the time into a distance
+  cm = microsecondsToCentimeters(duration);
+  
+  Serial.print(cm);
+  Serial.print("cm");
+  Serial.println();
 
+  delay(100);
+
+  if (cm > 12) {
+    turn_left();
+  }
 }
 
 double microsecondsToInches(double microseconds) {
   return microseconds / 74 / 2;
+}
+
+long microsecondsToCentimeters(long microseconds) {
+  // The speed of sound is 340 m/s or 29 microseconds per centimeter.
+  // The ping travels out and back, so to find the distance of the object we
+  // take half of the distance travelled.
+  return microseconds / 29 / 2;
 }
 
 void rbt_move() {
@@ -116,4 +155,4 @@ void turn_right() {
   analogWrite(enable_left, 0);
   delay(1860);
   rbt_stop();
-}
+} 
