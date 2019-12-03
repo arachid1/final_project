@@ -45,33 +45,6 @@ void loop() {
   digitalWrite(A, LOW);
   digitalWrite(B, HIGH);
   Serial.print("hey");
-//  rbt_forward();
-//  delay(3000);
-//  Serial.print("middle");
-//  rbt_stop();
-//  delay(3000);
-//  Serial.print("end");  
-  // char customKey1 = customKeypad.getKey();
-
-  // Testing US
-//  digitalWrite(trigPin, LOW);
-//  delayMicroseconds(2);
-//  digitalWrite(trigPin, HIGH);
-//  delayMicroseconds(5);
-//  digitalWrite(trigPin, LOW);
-//  duration = pulseIn(echoPin, HIGH); 
-//  Serial.println("duration");
-//  Serial.println(duration);
-//  distance = microsecondsToInches(duration);
-//  Serial.println("distance");
-//  Serial.println(distance);
-//  delay(1000);
-//  if (distance > 5) {
-//    rbt_stop();
-//    rbt_left();
-//    Serial.println("turn left");
-//  }
-  
 //  if (customKey1 == '9') {
 //    digitalWrite(A, LOW);
 //    digitalWrite(B, HIGH);
@@ -94,6 +67,11 @@ void loop() {
 //      }
 //    }
 //  }
+}
+
+// BOLAJI: write function that uses left sensor to detect wall and returns that distance
+void detect_wall() {
+
 }
 
 double microsecondsToInches(double microseconds) {
