@@ -14,8 +14,6 @@ char hexaKeys[ROWS][COLS] = {
 byte rowPins[ROWS] = {9, 8, 7, 6};
 byte colPins[COLS] = {5, 4, 3};
 
-int old_distance = -1;
-
 //Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 int enable_left = 11;
@@ -32,34 +30,42 @@ long duration, cm, start, ending;
 
 //NewPing sonar(trigPin, echoPin, MAX_DISTANCE);
 
-//float duration, distance;
+int distance;
+int old_distance = -1;
+bool deactivated = false;
 
 void setup() {
   Serial.begin(9600);
   pinMode(L, OUTPUT);
   pinMode(R, OUTPUT);
-  //rbt_forward(255);
+  rbt_forward(255);
 }
 
 void loop() {
 
+  //  Serial.print("here");
   rbt_forward(255);
-  int distance = detect_wall();
-  Serial.print(distance);
-  Serial.print("cm");
-  Serial.println();
-  if (abs(distance - old_distance) > 10) {
-    if (old_distance != -1) {
-      Serial.println("here");
-      rbt_stop();
-      //      Serial.print("turn right");
-      //      turn_right();
-      //      rbt_stop();
-      delay(5000);
-    }
-  }
-  old_distance = distance;
-  
+  //  distance = detect_wall();
+  //  if (deactivated == true) {
+  //    old_distance = distance;
+  //    deactivated = false;
+  //  }
+  //  Serial.print(distance);
+  //  Serial.print("cm");
+  //  Serial.println();
+  //  if (abs(distance - old_distance) > 10) {
+  //    if (old_distance != -1) {
+  //      rbt_stop();
+  //      delay(1000);
+  //      // Serial.print("turn right");
+  //      turn_left();
+  //      rbt_stop();
+  //      delay(3000);
+  //      deactivated = true;
+  //    }
+  //  }
+  //  old_distance = distance;
+
 
   //  if (customKey1 == '9') {
   //    digitalWrite(A, LOW);
@@ -88,29 +94,20 @@ void loop() {
 int detect_wall() {
 
   int cm = 0;
-  for (int i = 0; i < 15; i++) {
-    pinMode(echoPin, INPUT);
+  for (int i = 0; i < 5; i++) {
     pinMode(trigPin, OUTPUT);
     digitalWrite(trigPin, LOW);
     delayMicroseconds(2);
     digitalWrite(trigPin, HIGH);
-    delayMicroseconds(5);
+    delayMicroseconds(10);
     digitalWrite(trigPin, LOW);
-
-    pinMode(trigPin, INPUT);
-
-    while (digitalRead(echoPin) == LOW) {
-    }
-    start = micros();
-    while (digitalRead(echoPin) == HIGH) {
-    }
-    ending = micros();
-    duration = ending - start;
+    pinMode(echoPin, INPUT);
+    duration = pulseIn(echoPin, HIGH);
     // convert the time into a distance
     cm += microsecondsToCentimeters(duration);
   }
 
-  return cm / 10;
+  return cm / 5;
 }
 
 double microsecondsToInches(double microseconds) {
@@ -126,8 +123,8 @@ long microsecondsToCentimeters(long microseconds) {
 
 void rbt_move() {
 
-  digitalWrite(L, HIGH);
   digitalWrite(R, LOW);
+  digitalWrite(L, HIGH);
 }
 
 void rbt_stop() {
@@ -136,23 +133,21 @@ void rbt_stop() {
 }
 
 void rbt_forward(int value) {
+  rbt_move();
   analogWrite(enable_left, value);
   analogWrite(enable_right, value);
-  rbt_move();
-}
-
-void turn_left() {
-  rbt_move();
-  analogWrite(enable_left, 255);
-  analogWrite(enable_right, 0);
-  delay(2080);
-  rbt_stop();
 }
 
 void turn_right() {
   rbt_move();
+  analogWrite(enable_left, 255);
+  analogWrite(enable_right, 0);
+  delay(2080);
+}
+
+void turn_left() {
+  rbt_move();
   analogWrite(enable_right, 255);
   analogWrite(enable_left, 0);
   delay(1860);
-  rbt_stop();
 }
