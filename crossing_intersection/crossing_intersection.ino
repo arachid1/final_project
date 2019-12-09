@@ -18,13 +18,8 @@ byte colPins[COLS] = {5, 4, 3};
 
 int enable_left = 11;
 int enable_right = 10;
-
-int direction_left1 = 6;
-int direction_left2 = 7;
-
-int direction_right1 = 2;
-int direction_right2 = 3;
-
+int L = 1;
+int R = 2;
 int leftPin = A0;
 
 int echoPinL = 13;
@@ -45,68 +40,25 @@ bool deactivated = false;
 
 void setup() {
   Serial.begin(9600);
-  pinMode(direction_left1, OUTPUT);
-  pinMode(direction_left2, OUTPUT);
-  pinMode(direction_right1, OUTPUT);
-  pinMode(direction_right2, OUTPUT);
+  pinMode(L, OUTPUT);
+  pinMode(R, OUTPUT);
 }
 
 void loop() {
-
-  rbt_forward(200, 200);
-//  delay(1000);
-//  rbt_stop();
-//  delay(1000);
-//  left_distance = detect_left();
-//  Serial.print(left_distance);
-//  Serial.print("cm");
-//  Serial.println();
-
-  //  // Situation 3: Robot is driving towards wall.
-  //  // DETECT: distance is getting closer to a MIN threshold
-  //  // -> what to do?
-  //  // add more power on the left side
-  //  if (left_distance <= 7) {
-  //    Serial.println("left_distance <= 7");
-  //    rbt_stop();
-  //    delay(1000);
-  //    rbt_forward(255, 150);
-  //  }
-  //
-  //  // Situation 1: Robot is following the wall.
-  //  // DETECT: distances remain below a MAX threshold
-  //  // -> what to do?
-  //  // keep going straight
-  //  if ((left_distance >= 8) && (left_distance < 10)) {
-  //    Serial.println("(left_distance >= 8) && (left_distance <= 11)");
-  //    rbt_forward(230, 230);
-  //  }
-  //  //
-  //  //  // Situation 2: Robot is driving away from wall.
-  //  //  // DETECT: distance are above a MAX threshold
-  //  //  // -> what to do?
-  //  //  // add more power on the right side
-  //  if ((left_distance >= 10) && (left_distance <= 19)) {
-  //    Serial.println("(left_distance >= 11) && (left_distance <= 25)");
-  //    rbt_stop();
-  //    delay(1000);
-  //    rbt_forward(200, 255);
-  //  }
-  //
-  //  // Situation 5: There is no more wall
-  //  // DETECT: big change in distances of left sensor
-  //  // -> what to do?
-  //  // turn left
-  //
-//  if (left_distance > 22) {
-//    Serial.println("turning left");
-//    rbt_stop();
-//    delay(1000);
-//    turn_left();
-//    rbt_stop();
-//    delay(2000);
-//  }
-
+  rbt_forward(200,200);
+  for (int i = 0; i < 3; i++) {
+    Serial.println("iteration");
+    rbt_forward(220, 220);
+    delay(1000);
+    left_distance = detect_left();
+    if (left_distance < 15) {
+      Serial.println("here");
+      rbt_stop();
+    }
+    rbt_stop();
+    delay(1500);
+  }
+  exit(0);
   // BELOW USES FRONT SENSOR
 
   // Situation 4: The robot is at a corner
@@ -116,12 +68,12 @@ void loop() {
   // a) if front sensor is OFF, follow wall
   // a) if front sensor is ON, turn right again
 
+
+
+  // Situation 6: There is an obstacle we need to pass
+  // DETECT:
+
 }
-
-// Situation 6: There is an obstacle we need to pass
-// DETECT:
-
-
 
 int detect_front() {
   int cm = 0;
@@ -144,7 +96,7 @@ int detect_front() {
 int detect_left() {
 
   int cm = 0;
-  for (int i = 0; i < 15; i++) {
+  for (int i = 0; i < 10; i++) {
     pinMode(trigPinL, OUTPUT);
     digitalWrite(trigPinL, LOW);
     delayMicroseconds(2);
@@ -173,24 +125,20 @@ long microsecondsToCentimeters(long microseconds) {
 
 void rbt_move() {
 
-  digitalWrite(direction_left1, LOW);
-  digitalWrite(direction_left2, HIGH);
-  digitalWrite(direction_right1, HIGH);
-  digitalWrite(direction_right2, LOW);
+  digitalWrite(R, LOW);
+  digitalWrite(L, HIGH);
 }
 
 void rbt_stop() {
-  digitalWrite(direction_left1, LOW);
-  digitalWrite(direction_left2, LOW);
-  digitalWrite(direction_right1, LOW);
-  digitalWrite(direction_right2, LOW);
-  analogWrite(enable_left, 0);
-  analogWrite(enable_right, 0);
+  digitalWrite(L, HIGH);
+  digitalWrite(R, HIGH);
 }
 
 void rbt_forward(int left_value, int right_value) {
   rbt_move();
+  delay(250);
   analogWrite(enable_left, left_value);
+  // delay(1400);
   analogWrite(enable_right, right_value);
 }
 
@@ -208,6 +156,7 @@ void turn_left() {
   delay(2080);
 }
 
-void go_around() {
-
+void rbt_wall_search(int left_value, int right_value) {
+  rbt_forward(255, 255);
+  rbt_stop();
 }
